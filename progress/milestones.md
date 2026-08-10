@@ -207,3 +207,5 @@
 - understood partition tables
 #### Day 64
 - learned new commands for viewing disk partitions
+## 10.08.2026 - 16.08.2026
+#### Day 65
