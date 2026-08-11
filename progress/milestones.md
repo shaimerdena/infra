@@ -210,3 +210,5 @@
 ## 10.08.2026 - 16.08.2026
 #### Day 65
 - understood the general workflow of creating a single-partition disk
+#### Day 66
+- 
