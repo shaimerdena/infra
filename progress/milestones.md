@@ -211,4 +211,4 @@
 #### Day 65
 - understood the general workflow of creating a single-partition disk
 #### Day 66
-- 
+- understood the general workflow of creating a multiple-partition disk

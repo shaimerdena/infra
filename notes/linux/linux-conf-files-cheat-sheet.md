@@ -1,21 +1,21 @@
-# 📁 Linux Configuration Files Cheat Sheet
+# Linux Configuration Files Cheat Sheet
 
 Table of Contents:
-- [📁 Linux Configuration Files Cheat Sheet](#-linux-configuration-files-cheat-sheet)
-- [👤 User Configuration (`$HOME`)](#-user-configuration-home)
-- [⚙️ System Configuration (`/etc`)](#️-system-configuration-etc)
-  - [👥 Users \& Authentication](#-users--authentication)
-  - [💾 Filesystems \& Storage](#-filesystems--storage)
-  - [🌐 Networking](#-networking)
-  - [⏰ Scheduled Tasks](#-scheduled-tasks)
-  - [🖥️ Services](#️-services)
-  - [📜 Logging](#-logging)
-  - [📧 Mail](#-mail)
-  - [🖨️ Printing](#️-printing)
-  - [🐚 Shells](#-shells)
-  - [🗄️ Legacy](#️-legacy)
-- [⭐ Must Know](#-must-know)
-- [📝 Useful Commands](#-useful-commands)
+- [Linux Configuration Files Cheat Sheet](#linux-configuration-files-cheat-sheet)
+- [User Configuration (`$HOME`)](#user-configuration-home)
+- [System Configuration (`/etc`)](#system-configuration-etc)
+  - [Users \& Authentication](#users--authentication)
+  - [Filesystems \& Storage](#filesystems--storage)
+  - [Networking](#networking)
+  - [Scheduled Tasks](#scheduled-tasks)
+  - [Services](#services)
+  - [Logging](#logging)
+  - [Mail](#mail)
+  - [Printing](#printing)
+  - [Shells](#shells)
+  - [Legacy](#legacy)
+- [Must Know](#must-know)
+- [Useful Commands](#useful-commands)
  
 
 > Legend:
@@ -26,7 +26,7 @@ Table of Contents:
 
 ---
 
-# 👤 User Configuration (`$HOME`)
+# User Configuration (`$HOME`)
 
 | File / Directory | Priority | Purpose |
 |------------------|:-------:|---------|
@@ -37,9 +37,9 @@ Table of Contents:
 
 ---
 
-# ⚙️ System Configuration (`/etc`)
+# System Configuration (`/etc`)
 
-## 👥 Users & Authentication
+## Users & Authentication
 
 | File | Priority | Purpose |
 |------|:-------:|---------|
@@ -54,7 +54,7 @@ Table of Contents:
 
 ---
 
-## 💾 Filesystems & Storage
+## Filesystems & Storage
 
 | File | Priority | Purpose |
 |------|:-------:|---------|
@@ -63,7 +63,7 @@ Table of Contents:
 
 ---
 
-## 🌐 Networking
+## Networking
 
 | File | Priority | Purpose |
 |------|:-------:|---------|
@@ -77,7 +77,7 @@ Table of Contents:
 
 ---
 
-## ⏰ Scheduled Tasks
+## Scheduled Tasks
 
 | File | Priority | Purpose |
 |------|:-------:|---------|
@@ -85,7 +85,7 @@ Table of Contents:
 
 ---
 
-## 🖥️ Services
+## Services
 
 | File | Priority | Purpose |
 |------|:-------:|---------|
@@ -98,7 +98,7 @@ Table of Contents:
 
 ---
 
-## 📜 Logging
+## Logging
 
 | File | Priority | Purpose |
 |------|:-------:|---------|
@@ -106,7 +106,7 @@ Table of Contents:
 
 ---
 
-## 📧 Mail
+## Mail
 
 | File | Priority | Purpose |
 |------|:-------:|---------|
@@ -115,7 +115,7 @@ Table of Contents:
 
 ---
 
-## 🖨️ Printing
+## Printing
 
 | File | Priority | Purpose |
 |------|:-------:|---------|
@@ -124,7 +124,7 @@ Table of Contents:
 
 ---
 
-## 🐚 Shells
+## Shells
 
 | File | Priority | Purpose |
 |------|:-------:|---------|
@@ -134,7 +134,7 @@ Table of Contents:
 
 ---
 
-## 🗄️ Legacy
+## Legacy
 
 | File | Priority | Purpose |
 |------|:-------:|---------|
@@ -143,7 +143,7 @@ Table of Contents:
 
 ---
 
-# ⭐ Must Know
+# Must Know
 
 User Management
 
@@ -179,7 +179,7 @@ SSH
 
 ---
 
-# 📝 Useful Commands
+# Useful Commands
 
 User Information
 

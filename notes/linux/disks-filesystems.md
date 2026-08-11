@@ -9,6 +9,7 @@ Table of Contents:
     - [Viewing Disk Partitions](#viewing-disk-partitions)
     - [Device Naming](#device-naming)
     - [Creating a Single-Partition Disk](#creating-a-single-partition-disk)
+    - [Creating a Multiple-Partition Disk](#creating-a-multiple-partition-disk)
 
 ## Partitioning Hard Disks
 
@@ -234,3 +235,111 @@ Example:
 `1` -	Check filesystem for errors during boot
 
 <i> Note: Partitioning divides the disk, mkfs creates the filesystem, and mount makes that filesystem accessible through a directory. </i>
+
+### Creating a Multiple-Partition Disk
+
+**General workflow**
+```text
+Disk
+ ↓
+Create partition table
+ ↓
+Create multiple partitions
+ ↓
+Set partition types
+ ↓
+Write changes
+ ↓
+Notify kernel
+ ↓
+Create filesystem / swap / LVM on partitions
+```
+
+**1. Identify and unmount the disk**
+
+Find the device name, for example: `/dev/sda` <br>
+Unmount any automatically mounted partitions: `umount /dev/sda1`
+
+**Important: Always verify the correct disk before modifying it. Partitioning the wrong disk can destroy data.**
+
+⸻
+
+**2. Create partitions with fdisk**
+
+Open the disk: `fdisk /dev/sda`
+
+Create a new partition: `...n`
+
+Choose:
+* p → primary partition
+* e → extended partition
+
+Specify the size using: +5G, +3G, +1024M
+
+**MBR limitation**
+
+With MBR:
+
+* maximum 4 primary partitions;
+* an extended partition can contain logical partitions;
+* logical partitions are numbered starting from 5.
+
+Example:
+```text
+/dev/sda1  → primary
+/dev/sda2  → primary
+/dev/sda3  → primary
+/dev/sda4  → extended
+    ├── /dev/sda5 → logical
+    └── /dev/sda6 → logical
+```
+The extended partition acts as a container for logical partitions.
+
+⸻
+
+**3. Change partition types**
+
+Inside fdisk, use: `...t`
+
+Then specify the partition and its type code.
+
+Common examples:
+```text
+Code	Type	Purpose
+82	Linux swap	Swap area
+c	W95 FAT32	FAT32 filesystem
+8e	Linux LVM	LVM physical volume
+```
+Use to display available partition type codes: `...L`
+
+⸻
+
+**4. Check and save**
+
+Display the partition table: `...p` <br>
+Write the changes: `...w`
+
+`...w` saves the changes. **Be careful: partitioning changes can destroy data.**
+
+⸻
+
+**5. Make the kernel recognize the new partitions**
+
+Check: `grep sda /proc/partitions` <br>
+If the new partitions are not visible: `partprobe /dev/sda`
+
+Alternatively, reboot the system.
+
+⸻
+
+**6. Prepare each partition**
+
+Creating a partition does not automatically create a usable filesystem.
+
+Different partitions can be prepared for different purposes. A partition’s type tells Linux what the partition is intended for, but the partition still needs to be properly prepared before use.
+
+Regular Linux filesystem: `mkfs -t ext4 /dev/sda1` <br>
+Swap: `mkswap /dev/sda2` <br>
+ext2: `mkfs /dev/sda3`  <br>
+FAT32: `mkfs -t vfat /dev/sda5` <br>
+LVM Physical Volume: `pvcreate /dev/sda6`
