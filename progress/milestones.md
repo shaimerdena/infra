@@ -213,4 +213,4 @@
 #### Day 66
 - understood the general workflow of creating a multiple-partition disk
 #### Day 67
-- 
+- learned more about lvms

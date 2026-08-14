@@ -364,3 +364,98 @@ Advantages:
 
 ### Checking existing LVMs
 
+| Command	| Purpose |
+| --- | --- |
+| fdisk -l /dev/sda |	View disk partitions |
+| pvdisplay /dev/sda2	| View Physical Volume information |
+| vgdisplay vg_abc	| View Volume Group information |
+| lvdisplay vg_abc	| View Logical Volume information |
+| grep vg_ /etc/fstab	| See how LVM volumes are configured and mounted |
+
+**1. Check disk partitions**
+
+`fdisk -l /dev/sda`
+
+Shows the partitions on the disk and their types.
+
+For example:
+```bash
+/dev/sda1 → Linux
+/dev/sda2 → Linux LVM
+```
+A partition marked Linux LVM can be used as a Physical Volume.
+
+⸻
+
+**2. Check the Physical Volume**
+
+`pvdisplay /dev/sda2`
+
+
+Example:
+```text
+PV Name        /dev/sda2
+VG Name        vg_abc
+PV Size        148.52 GiB
+PE Size        4.00 MiB
+Total PE       38021
+Free PE        0
+Allocated PE   38021
+```
+Here, all PE are allocated, so the PV has no free space.
+
+⸻
+
+**3. Check the Volume Group**
+
+`vgdisplay vg_abc`
+
+Example:
+```text
+VG Size          148.52 GiB
+PE Size          4.00 MiB
+Total PE         38021
+Alloc PE / Size  38021 / 148.52 GiB
+Free PE / Size   0 / 0
+```
+⸻
+
+**4. Check Logical Volumes**
+
+`lvdisplay vg_abc`
+
+Shows the Logical Volumes created inside the VG.
+
+Example:
+```text
+/dev/vg_abc/lv_root  → 50 GiB
+/dev/vg_abc/lv_home  → 92.64 GiB
+/dev/vg_abc/lv_swap  → 5.88 GiB
+```
+Each LV has a device path:
+
+`/dev/<VG>/<LV>`
+
+They can also be accessed through /dev/mapper/:
+```text
+/dev/mapper/vg_abc-lv_root
+/dev/mapper/vg_abc-lv_home
+/dev/mapper/vg_abc-lv_swap
+```
+⸻
+
+**5. Check how LVs are used**
+
+`grep vg_ /etc/fstab`
+
+Example:
+```text
+/dev/mapper/vg_abc-lv_root  /      ext4  defaults  1 1
+/dev/mapper/vg_abc-lv_home  /home  ext4  defaults  1 2
+/dev/mapper/vg_abc-lv_swap  swap   swap  defaults  0 0
+```
+This shows where each Logical Volume is mounted and what it is used for.
+
+* lv_root → / → ext4
+* lv_home → /home → ext4
+* lv_swap → swap space
