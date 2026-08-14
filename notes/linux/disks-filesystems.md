@@ -10,6 +10,8 @@ Table of Contents:
     - [Device Naming](#device-naming)
     - [Creating a Single-Partition Disk](#creating-a-single-partition-disk)
     - [Creating a Multiple-Partition Disk](#creating-a-multiple-partition-disk)
+  - [LVM Partitions](#lvm-partitions)
+    - [Checking existing LVMs](#checking-existing-lvms)
 
 ## Partitioning Hard Disks
 
@@ -343,3 +345,22 @@ Swap: `mkswap /dev/sda2` <br>
 ext2: `mkfs /dev/sda3`  <br>
 FAT32: `mkfs -t vfat /dev/sda5` <br>
 LVM Physical Volume: `pvcreate /dev/sda6`
+
+## LVM Partitions
+
+Logical Volume Manager (LVM)
+
+* LVM provides flexible storage management compared with traditional disk partitions.
+* Physical volumes (PV) are combined into volume groups (VG).
+* Logical volumes (LV) receive storage space from the volume group as needed.
+
+Advantages:
+
+* Extend an LV by adding free space from the VG while it is still in use.
+* Add new PVs to a VG when more storage is needed.
+* Move data between PVs, allowing smaller disks to be replaced with larger ones without downtime.
+* Shrink filesystems to reclaim space. The LV must be unmounted, but a reboot is not required.
+* Supports advanced features such as mirroring and clustering.
+
+### Checking existing LVMs
+
