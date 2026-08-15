@@ -12,6 +12,8 @@ Table of Contents:
     - [Creating a Multiple-Partition Disk](#creating-a-multiple-partition-disk)
   - [LVM Partitions](#lvm-partitions)
     - [Checking existing LVMs](#checking-existing-lvms)
+    - [Creating LVM Logical Volumes](#creating-lvm-logical-volumes)
+    - [Growing LVM Logical Volumes](#growing-lvm-logical-volumes)
 
 ## Partitioning Hard Disks
 
@@ -432,9 +434,7 @@ Example:
 /dev/vg_abc/lv_home  → 92.64 GiB
 /dev/vg_abc/lv_swap  → 5.88 GiB
 ```
-Each LV has a device path:
-
-`/dev/<VG>/<LV>`
+Each LV has a device path: `/dev/<VG>/<LV>`
 
 They can also be accessed through /dev/mapper/:
 ```text
@@ -459,3 +459,100 @@ This shows where each Logical Volume is mounted and what it is used for.
 * lv_root → / → ext4
 * lv_home → /home → ext4
 * lv_swap → swap space
+
+---
+
+### Creating LVM Logical Volumes
+
+**General workflow**
+```text
+LVM volumes are created from the bottom up:
+
+Physical Volume (PV)
+        ↓
+Volume Group (VG)
+        ↓
+Logical Volume (LV)
+        ↓
+Filesystem
+        ↓
+Mount
+```
+
+<i> Note: LVM is created bottom → up, but used top → down. </i>
+
+**1. Create a Physical Volume**
+
+Prepare a partition as an LVM Physical Volume: `pvcreate /dev/sda6`
+
+**2. Create a Volume Group**
+
+Add the PV to a new Volume Group: `vgcreate myvg0 /dev/sda6` <br>
+Check the VG: `vgdisplay myvg0`
+
+**3. Create a Logical Volume**
+
+Create a 1 GB LV named music: `lvcreate -n music -L 1G myvg0` <br>
+The LV will be available as: `/dev/mapper/myvg0-music`
+
+**4. Create a Filesystem**
+
+Create an ext4 filesystem on the LV: `mkfs -t ext4 /dev/mapper/myvg0-music`
+
+**5. Mount the Logical Volume**
+
+Create a mount point: `mkdir /mnt/mymusic` <br>
+Mount the LV: `mount /dev/mapper/myvg0-music /mnt/mymusic` <br>
+Check: `df -h /mnt/mymusic`
+
+**6. Mount Automatically**
+
+To mount the LV automatically after reboot, add it to /etc/fstab:
+
+`/dev/mapper/myvg0-music /mnt/mymusic ext4 defaults 1 2`
+
+--- 
+
+### Growing LVM Logical Volumes
+
+If a Logical Volume runs out of space, it can be expanded while still mounted.
+
+**Workflow**
+```text
+Free space in VG
+      ↓
+lvextend
+      ↓
+Larger LV
+      ↓
+resize2fs
+      ↓
+Larger filesystem
+```
+
+<i> Note: lvextend increases the Logical Volume, but the filesystem does not automatically become larger. You must also resize the filesystem. </i>
+
+**Requirements:**
+
+* The Volume Group must have free space.
+* The Logical Volume must be extended.
+* The filesystem must then be resized to use the new space.
+
+**1. Check available space**
+
+Check free space in the Volume Group: `vgdisplay myvg0`
+Check current filesystem usage: `df -h /mnt/mymusic`
+
+**2. Extend the Logical Volume**
+
+Add 1 GB: `lvextend -L +1G /dev/mapper/myvg0-music`
+
+**3. Resize the filesystem**
+
+For an ext4 filesystem: `resize2fs /dev/mapper/myvg0-music`
+
+**4. Verify the new size**
+
+`df -h /mnt/mymusic`
+
+The filesystem should now show the additional space.

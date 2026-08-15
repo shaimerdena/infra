@@ -214,3 +214,6 @@
 - understood the general workflow of creating a multiple-partition disk
 #### Day 67
 - learned more about lvms
+#### Day 68
+- learned how to create lvm logical volumes
+- learned how to grow lvm logical volumes
