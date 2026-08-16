@@ -14,6 +14,8 @@ Table of Contents:
     - [Checking existing LVMs](#checking-existing-lvms)
     - [Creating LVM Logical Volumes](#creating-lvm-logical-volumes)
     - [Growing LVM Logical Volumes](#growing-lvm-logical-volumes)
+  - [Mounting Filesystems](#mounting-filesystems)
+    - [Supported Filesystems](#supported-filesystems)
 
 ## Partitioning Hard Disks
 
@@ -556,3 +558,21 @@ For an ext4 filesystem: `resize2fs /dev/mapper/myvg0-music`
 `df -h /mnt/mymusic`
 
 The filesystem should now show the additional space.
+
+## Mounting Filesystems
+
+### Supported Filesystems
+
+Linux supports many filesystem types, for example: ext2, ext3, ext4, XFS, Btrfs, VFAT, MS-DOS, CIFS, and others.
+
+**View supported filesystems**
+
+To see filesystem types supported by the current Linux kernel: `cat /proc/filesystems`. <br>
+This shows filesystems available in the current system/kernel.
+
+Get information about filesystems use: `man fs`. <br>
+This provides information and descriptions of Linux filesystem types.
+
+You can also search for information about a specific filesystem: `man ext4`, `man xfs` and so on.
+
+<i> Note: When a supported filesystem is mounted, Linux can load the corresponding filesystem module if it is not already loaded. </i>

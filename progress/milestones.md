@@ -217,3 +217,5 @@
 #### Day 68
 - learned how to create lvm logical volumes
 - learned how to grow lvm logical volumes
+#### Day 69
+- practiced viewing supported filesystems
