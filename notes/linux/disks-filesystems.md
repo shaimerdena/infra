@@ -580,3 +580,35 @@ You can also search for information about a specific filesystem: `man ext4`, `ma
 
 ### Enabling swap areas
 
+Swap is disk space that Linux can use when RAM is running low.
+
+* Swap can be created from a partition or a file.
+* Data can be temporarily moved from RAM to swap.
+* Swap is much slower than RAM, but it can prevent processes from failing when RAM is full.
+
+**1. Check current swap**
+
+`free -m`
+
+Shows RAM and swap usage.
+
+**2. Create a swap file**
+
+Create a 1 GB file: `dd if=/dev/zero of=/var/opt/myswap bs=1M count=1024` <br>
+Restrict access to the file: `chmod 600 /var/opt/myswap` <br>
+Turn the file into a swap area: `mkswap /var/opt/myswap`
+
+**3. Enable swap**
+
+Enable it immediately: `swapon /var/opt/myswap` <br>
+Check that it is available: `free -m`
+
+**4. Make swap permanent**
+
+Add the swap file to /etc/fstab: `/var/opt/myswap swap swap defaults 0 0`
+
+This makes the swap area available automatically after reboot.
+
+You can also enable all swap entries from /etc/fstab with: `swapon -a`
+
+<i> Note: mkswap prepares the space for swapping, while swapon actually enables it. </i>

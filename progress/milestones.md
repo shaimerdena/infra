@@ -221,3 +221,4 @@
 - practiced viewing supported filesystems
 ## 17.08.2026 - 23.08.2026
 #### Day 70
+- learned how to enable swap area
