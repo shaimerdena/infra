@@ -16,6 +16,7 @@ Table of Contents:
     - [Growing LVM Logical Volumes](#growing-lvm-logical-volumes)
   - [Mounting Filesystems](#mounting-filesystems)
     - [Supported Filesystems](#supported-filesystems)
+    - [Enabling swap areas](#enabling-swap-areas)
 
 ## Partitioning Hard Disks
 
@@ -576,3 +577,6 @@ This provides information and descriptions of Linux filesystem types.
 You can also search for information about a specific filesystem: `man ext4`, `man xfs` and so on.
 
 <i> Note: When a supported filesystem is mounted, Linux can load the corresponding filesystem module if it is not already loaded. </i>
+
+### Enabling swap areas
+

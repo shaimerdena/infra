@@ -219,3 +219,5 @@
 - learned how to grow lvm logical volumes
 #### Day 69
 - practiced viewing supported filesystems
+## 17.08.2026 - 23.08.2026
+#### Day 70
