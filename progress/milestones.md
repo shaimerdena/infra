@@ -222,3 +222,5 @@
 ## 17.08.2026 - 23.08.2026
 #### Day 70
 - learned how to enable swap area
+#### Day 71
+- learned how to disable swap area

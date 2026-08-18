@@ -17,6 +17,7 @@ Table of Contents:
   - [Mounting Filesystems](#mounting-filesystems)
     - [Supported Filesystems](#supported-filesystems)
     - [Enabling swap areas](#enabling-swap-areas)
+    - [Disabling swap area](#disabling-swap-area)
 
 ## Partitioning Hard Disks
 
@@ -612,3 +613,13 @@ This makes the swap area available automatically after reboot.
 You can also enable all swap entries from /etc/fstab with: `swapon -a`
 
 <i> Note: mkswap prepares the space for swapping, while swapon actually enables it. </i>
+
+### Disabling swap area
+
+**1.Make sure that swap area is not being used**
+
+`free -m`
+
+**2. Turn off the swap area**
+
+`swapoff /var/opt/myswap`
