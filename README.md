@@ -27,8 +27,6 @@ coming soon...
 ## Kubernetes
 coming soon...
 
-## Progress
-- [Milestones](progress/milestones.md)
 ## Projects (scripts)
 - [Simple scripts](projects/simple-scripts)
 ## Resources
