@@ -17,7 +17,9 @@ My journey into Linux, networking, infrastructure and DevOps.
 - [Managing Disks and Filesystems](/notes/linux/disks-filesystems.md)
 
 ## Docker
-coming soon...
+- [Intro](/notes/docker/intro.md)
+- [Docker Fundamentals & Containerization](/notes/docker/docker_fundamentals.md)
+
 ## Nginx
 coming soon...
 ## Cloud
