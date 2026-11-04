@@ -20,6 +20,10 @@ My journey into Linux, networking, infrastructure and DevOps.
 - [Intro](/notes/docker/intro.md)
 - [Docker Fundamentals & Containerization](/notes/docker/docker_fundamentals.md)
 
+## CI/CD
+- [Intro](/notes/cicd/intro.md)
+- [Fundamentals](/notes/cicd/fundamentals.md)
+
 ## Nginx
 coming soon...
 ## Cloud
