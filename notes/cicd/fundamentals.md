@@ -16,7 +16,7 @@ Table of Contents:
 
 ## 1. DevOps и SDLC
 
-### Что такое DevOps?Table of Contents:
+### Что такое DevOps?
 
 **DevOps** — это культура и набор практик, направленных на улучшение взаимодействия между командами Development (разработка) и Operations (эксплуатация).
 
