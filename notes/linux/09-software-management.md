@@ -199,4 +199,4 @@ Repositories are configured in: `/etc/dnf/dnf.conf` or `/etc/yum.repos.d/`.
 <br>
 <br>
 
-**The next topic: [Managing-user-accounts](./10-managing-user-accounts)**
+**The next topic: [Managing-user-accounts](./10-managing-user-accounts.md)**
