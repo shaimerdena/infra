@@ -967,4 +967,4 @@ Unlike `rmmod`, `modprobe -r` can also remove related dependency modules that ar
 <br>
 <br>
 
-**The next topic: [System Administration](./09-software-management.md)** 
+**The next topic: [Software management](./09-software-management.md)** 
