@@ -3,26 +3,31 @@
 My journey into Linux, networking, infrastructure and DevOps.
 
 ## Linux Fundamentals
-- [Linux Basics](notes/linux/intro.md)
-- [Using the Shell](notes/linux/using-the-shell.md)
-- [Filesystem](notes/linux/filesystem.md)
-- [Text Files](notes/linux/text-files.md)
-- [Processes](notes/linux/processes.md)
-- [Simple Scripts 1](notes/linux/simple-scripts-1.md)
-- [Simple Scripts 2](notes/linux/simple-scripts-2.md)
-- [System Administration](notes/linux/sys-admin.md)
-- [Linux Configuration Files Cheat Sheet](notes/linux/linux-conf-files-cheat-sheet.md)
-- [Software management](/notes/linux/software-management.md)
-- [Managing User Accounts](/notes/linux/managing-user-accounts.md)
-- [Managing Disks and Filesystems](/notes/linux/disks-filesystems.md)
+- [1. Linux Basics](notes/linux/01-intro.md)
+- [2. Using the Shell](notes/linux/02-using-the-shell.md)
+- [3. Filesystem](notes/linux/03-filesystem.md)
+- [4. Text Files](notes/linux/04-text-files.md)
+- [5. Processes](notes/linux/05-processes.md)
+- [6. Simple Scripts 1](notes/linux/06-simple-scripts-1.md)
+- [7. Simple Scripts 2](notes/linux/07-simple-scripts-2.md)
+- [8. System Administration](notes/linux/08-sys-admin.md)
+- [9. Software management](/notes/linux/09-software-management.md)
+- [10. Managing User Accounts](/notes/linux/10-managing-user-accounts.md)
+- [11. Managing Disks and Filesystems](/notes/linux/11-disks-filesystems.md)
 
 ## Docker
-- [Intro](/notes/docker/intro.md)
-- [Docker Fundamentals & Containerization](/notes/docker/docker_fundamentals.md)
+- [1. Intro](/notes/docker/01-intro.md)
+- [2. Docker Fundamentals & Containerization](/notes/docker/02-docker_fundamentals.md)
 
 ## CI/CD
-- [Intro](/notes/cicd/intro.md)
-- [Fundamentals](/notes/cicd/fundamentals.md)
+- [1. Intro](/notes/cicd/01-intro.md)
+- [2. Fundamentals](/notes/cicd/02-fundamentals.md)
+
+## Database management
+- [1. Fundamentals](/notes/database/01-fundamentals.md)
+- [2. Performance and scaling](/notes/database/02-performance-and-scaling.md)
+- [3. Migrations and flyway](/notes/database/03-migrations-and-flyway.md)
+- [4. Replication and high availability](/notes/database/04-replication-and-ha.md)
 
 ## Nginx
 coming soon...
