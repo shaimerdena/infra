@@ -89,16 +89,16 @@ The table records metadata about migrations that have been applied.
 
 Common fields include:
 
-  Field              Purpose
-  ------------------ -----------------------------------------------
-  `installed_rank`   Order in which migrations were installed
-  `version`          Version associated with a versioned migration
-  `description`      Human-readable migration description
-  `type`             Migration type
-  `script`           Script name
-  `checksum`         Checksum used to detect changes
-  `installed_on`     Installation timestamp
-  `success`          Whether the migration succeeded
+| Field | Purpose | 
+| ----- | ----- | 
+| `installed_rank` | Order in which migrations were installed | 
+| `version` | Version associated with a versioned migration | 
+| `description` | Human-readable migration description | 
+| `type` | Migration type | 
+| `script` | Script name | 
+| `checksum` | Checksum used to detect changes | 
+| `installed_on` | Installation timestamp | 
+| `success` | Whether the migration succeeded | 
 
 The schema history table allows Flyway to distinguish migrations that
 have already been applied from migrations that are still pending.

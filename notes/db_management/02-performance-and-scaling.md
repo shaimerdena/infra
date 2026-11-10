@@ -23,25 +23,14 @@ understanding of the workload.
 
 Several metrics describe different aspects of system performance.
 
-  -----------------------------------------------------------------------
-  Metric                              Meaning
-  ----------------------------------- -----------------------------------
-  Latency                             Time taken for an operation or
-                                      request to complete
-
-  Throughput                          Amount of work completed per unit
-                                      of time
-
-  RPS                                 Requests processed per second
-
-  TPS                                 Transactions processed per second
-
-  Error rate                          Proportion of requests or
-                                      operations that fail
-
-  Concurrency                         Number of operations or requests
-                                      active at the same time
-  -----------------------------------------------------------------------
+| Metric | Meaning |
+| --- | --- |
+| **Latency** | Time taken for an operation or request to complete |
+| **Throughput** | Amount of work completed per unit of time |
+| **RPS** | Requests processed per second |
+| **TPS** | Transactions processed per second |
+| **Error rate** | Proportion of requests or operations that fail |
+| **Concurrency** | Number of operations or requests active at the same time |
 
 RPS and TPS are related but not interchangeable. One application request
 may execute multiple SQL statements or transactions. The exact
@@ -179,24 +168,13 @@ locate values without scanning the entire index linearly.
 PostgreSQL supports several index methods for different data and query
 patterns:
 
-  -----------------------------------------------------------------------
-  Method                              Typical use
-  ----------------------------------- -----------------------------------
-  B-tree                              General equality, range and
-                                      ordering operations
-
-  Hash                                Equality comparisons
-
-  GIN                                 Composite values such as arrays and
-                                      JSONB containment/search
-
-  GiST                                Extensible indexing for spatial,
-                                      geometric and other complex data
-                                      types
-
-  BRIN                                Very large tables where values
-                                      correlate with physical row order
-  -----------------------------------------------------------------------
+| Method | Typical use | 
+| ----- | ----- | 
+| **B-tree** | General equality, range and ordering operations | 
+| **Hash** | Equality comparisons | 
+| **GIN** | Composite values such as arrays and JSONB containment/search | 
+| **GiST** | Extensible indexing for spatial, geometric and other complex data types | 
+| **BRIN** | Very large tables where values correlate with physical row order | 
 
 The appropriate index type depends on the operators used by the queries
 and the characteristics of the data.
@@ -333,18 +311,11 @@ connections.
 
 Its main pooling modes are:
 
-  -----------------------------------------------------------------------
-  Mode                                Connection assignment
-  ----------------------------------- -----------------------------------
-  Session                             A server connection is assigned for
-                                      the lifetime of a client session
-
-  Transaction                         A server connection is assigned for
-                                      the duration of a transaction
-
-  Statement                           A server connection is released
-                                      after each statement
-  -----------------------------------------------------------------------
+| Mode | Connection assignment | 
+| ----- | ----- | 
+| **Session** | A server connection is assigned for the lifetime of a client session | 
+| **Transaction** | A server connection is assigned for the duration of a transaction | 
+| **Statement** | A server connection is released after each statement | 
 
 Transaction pooling can support high volumes of short transactions, but
 it changes connection semantics. Features that depend on session state

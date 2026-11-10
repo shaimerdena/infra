@@ -132,24 +132,13 @@ commits may wait or block depending on configuration.
 
 ## 6. Synchronous vs Asynchronous Replication
 
-  -----------------------------------------------------------------------
-  Characteristic          Asynchronous            Synchronous
-  ----------------------- ----------------------- -----------------------
-  Waits for standby       No                      Yes, according to
-  acknowledgement                                 configuration
-
-  Commit latency          Usually lower           Usually higher
-
-  Risk of losing recent   Higher                  Lower under the
-  acknowledged changes                            configured guarantees
-  after primary failure                           
-
-  Dependence on standby   No                      Yes
-  response for commit                             
-
-  Typical trade-off       Performance and         Stronger replication
-                          availability            acknowledgement
-  -----------------------------------------------------------------------
+| Characteristic | Asynchronous | Synchronous |
+| ----- | ----- | ----- |
+| **Waits for standby acknowledgement** | No | Yes, according to configuration |
+| **Commit latency** | Usually lower | Usually higher |
+| **Risk of losing recent acknowledged changes after primary failure** | Higher | Lower under the configured guarantees |
+| **Dependence on standby response for commit** | No | Yes |
+| **Typical trade-off** | Performance and availability | Stronger replication acknowledgement |
 
 Neither mode removes the need for backups. Replication can copy unwanted
 changes as well as wanted ones. For example, an accidental deletion or
@@ -256,14 +245,14 @@ other.
 
 These mechanisms solve different problems:
 
-  Mechanism      Main purpose
-  -------------- ------------------------------------------------
-  Backup         Preserve recoverable copies of data
-  Restore        Recover data from a backup
-  Replication    Maintain additional copies of database changes
-  Failover       Move service responsibility to another node
-  VIP or proxy   Redirect clients to an available endpoint
-  Monitoring     Detect health and availability problems
+| Mechanism | Main purpose | 
+| ----- | ----- | 
+| **Backup** | Preserve recoverable copies of data | 
+| **Restore** | Recover data from a backup | 
+| **Replication** | Maintain additional copies of database changes | 
+| **Failover** | Move service responsibility to another node | 
+| **VIP or proxy** | Redirect clients to an available endpoint | 
+| **Monitoring** | Detect health and availability problems | 
 
 A resilient database architecture commonly combines these mechanisms.
 

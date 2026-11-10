@@ -39,22 +39,13 @@ restarts and replacement. A database such as PostgreSQL is stateful
 because it stores persistent records, indexes, transaction-related
 information and database metadata.
 
-  -----------------------------------------------------------------------
-  Characteristic          Stateless workload      Stateful workload
-  ----------------------- ----------------------- -----------------------
-  Persistent local data   Usually not required    Required or carefully
-                                                  managed
-
-  Instance replacement    Usually straightforward Requires data and
-                                                  identity considerations
-
-  Storage lifecycle       Often disposable        Must outlive an
-                                                  individual
-                                                  process/container
-
-  Examples                Stateless API workers   PostgreSQL, message
-                                                  brokers
-  -----------------------------------------------------------------------
+---
+| Characteristic    |	Stateless  Workload	| Stateful Workload |
+|-------------------|----------------------|-------------------|
+| Persistent local data |	Usually not required 	| Required or carefully managed
+| Instance replacement	| Usually straightforward	| Requires data and identity considerations
+| Storage lifecycle	| Often disposable	| Must outlive an individual process/container
+| Examples	| Stateless API workers	| PostgreSQL, message brokers
 
 Containerization does not make a stateful application inherently unsafe.
 The important requirement is to manage persistent storage, backups,
@@ -178,25 +169,13 @@ Considerations include:
 
 ### Network Driver Comparison
 
-  ------------------------------------------------------------------------------
-  Feature           Bridge                   Host              Macvlan
-  ----------------- ------------------------ ----------------- -----------------
-  Network namespace Separate                 Shared with host  Separate
-
-  Network identity  Docker network address   Host network      Own MAC/IP
-                                             identity          identity
-
-  Port publishing   Commonly used            Not used in the   Usually
-                                             usual way         unnecessary for
-                                                               LAN access
-
-  Isolation         Provides network         Reduced           Separate network
-                    isolation                                  endpoint
-
-  Typical use       Container-to-container   Specific          Direct presence
-                    communication            host-network      on a physical LAN
-                                             requirements      
-  ------------------------------------------------------------------------------
+| Feature | Bridge | Host | Macvlan |
+| :--- | :--- | :--- | :--- |
+| **Network namespace** | Separate | Shared with host | Separate |
+| **Network identity** | Docker network address | Host network identity | Own MAC/IP identity |
+| **Port publishing** | Commonly used | Not used in the usual way | Usually unnecessary for LAN access |
+| **Isolation** | Provides network isolation | Reduced | Separate network endpoint |
+| **Typical use** | Container-to-container communication | Specific host-network requirements | Direct presence on a physical LAN |
 
 ## 5. Service Readiness and Health Checks
 
@@ -246,18 +225,18 @@ A systemd unit file describes how a service should be managed. A
 
 ### Important Directives
 
-  Directive           Purpose
-  ------------------- -----------------------------------------------------
-  `ExecStart=`        Command used to start the service
-  `ExecStop=`         Command used to stop the service
-  `User=`             User identity used to run the service process
-  `Restart=`          Conditions under which systemd restarts the service
-  `RestartSec=`       Delay before a restart attempt
-  `Requires=`         Adds a required unit dependency
-  `Wants=`            Adds a weaker dependency
-  `After=`            Defines ordering relative to another unit
-  `StandardOutput=`   Controls where standard output is sent
-  `StandardError=`    Controls where standard error is sent
+| Directive | Purpose |
+| --- | --- |
+| `ExecStart=` | Command used to start the service |
+| `ExecStop=` | Command used to stop the service |
+| `User=` | User identity used to run the service process |
+| `Restart=` | Conditions under which systemd restarts the service |
+| `RestartSec=` | Delay before a restart attempt |
+| `Requires=` | Adds a required unit dependency |
+| `Wants=` | Adds a weaker dependency |
+| `After=` | Defines ordering relative to another unit |
+| `StandardOutput=` | Controls where standard output is sent |
+| `StandardError=` | Controls where standard error is sent |
 
 `Requires=` and `After=` are not interchangeable. `Requires=` expresses
 a dependency relationship, while `After=` specifies ordering. A unit can
@@ -297,11 +276,11 @@ automatically make Docker access unprivileged.
 
 Unix-like processes commonly use three standard file descriptors:
 
-  Stream     File descriptor Purpose
-  -------- ----------------- -----------------------------
-  stdin                  `0` Standard input
-  stdout                 `1` Normal output
-  stderr                 `2` Error and diagnostic output
+| Stream | File descriptor | Purpose |
+| --- | --- | --- |
+| `stdin` | `0` | Standard input |
+| `stdout` | `1` | Normal output |
+| `stderr` | `2` | Error and diagnostic output |
 
 systemd can direct stdout and stderr to different destinations. Log
 rotation is important when writing to files, because log files can grow
