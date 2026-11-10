@@ -24,10 +24,10 @@ My journey into Linux, networking, infrastructure and DevOps.
 - [2. Fundamentals](/notes/cicd/02-fundamentals.md)
 
 ## Database management
-- [1. Fundamentals](/notes/database/01-fundamentals.md)
-- [2. Performance and scaling](/notes/database/02-performance-and-scaling.md)
-- [3. Migrations and flyway](/notes/database/03-migrations-and-flyway.md)
-- [4. Replication and high availability](/notes/database/04-replication-and-ha.md)
+- [1. Fundamentals](/notes/db_management/01-fundamentals.md)
+- [2. Performance and scaling](/notes/db_management/02-performance-and-scaling.md)
+- [3. Migrations and flyway](/notes/db_management/03-migrations-and-flyway.md)
+- [4. Replication and high availability](/notes/db_management/04-replication-and-ha.md)
 
 ## Nginx
 coming soon...
