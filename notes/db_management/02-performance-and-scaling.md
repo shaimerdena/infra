@@ -107,9 +107,9 @@ repeatedly retrieving or computing it.
 
 A common measure is the cache hit ratio:
 
-\[ `\text{Hit Ratio}`{=tex} = `\frac{\text{Cache Hits}}`{=tex}
-{`\text{Cache Hits}`{=tex}+`\text{Cache Misses}`{=tex}}
-`\times 100`{=tex}% \]
+$$
+\text{Cache Hit Ratio} = \frac{\text{Cache Hits}}{\text{Cache Hits} + \text{Cache Misses}} \times 100\%
+$$
 
 A high hit ratio can be beneficial when the workload repeatedly accesses
 the same data. However, the ratio alone does not prove that the
