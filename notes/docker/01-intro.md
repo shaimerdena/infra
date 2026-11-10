@@ -136,10 +136,3 @@ The entire Docker workflow can be summarized as:
 The central idea is simple:
 
 Docker packages an application and its environment into images, runs those images as isolated containers, connects containers through networks, and stores persistent data in volumes.
-
-
-<br>
-<br>
-<br>
-
-**The next topic: [Docker Fundamentals & Containerization](/notes/docker/docker_fundamentals.md)**
