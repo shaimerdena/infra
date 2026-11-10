@@ -364,4 +364,4 @@ Result:
 <br>
 <br>
 
-**The next topic: [Managing Disks and Filesystems](/notes/linux/disks-filesystems.md)**
+**The next topic: [Managing Disks and Filesystems](/notes/linux/11-disks-filesystems.md)**

@@ -48,4 +48,4 @@ Linux can be used far beyond a traditional desktop operating system.
 <br>
 <br>
 
-**The next topic: [Using the shell](./using-the-shell.md)**
+**The next topic: [Using the shell](./02-using-the-shell.md)**

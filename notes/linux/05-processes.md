@@ -694,4 +694,4 @@ Root can:
 <br>
 <br>
 
-**The next topic: [Simple Scripts 1](./simple-scripts-1.md)**
+**The next topic: [Simple Scripts 1](./06-simple-scripts-1.md)**
