@@ -513,4 +513,4 @@ Output:
 <br>
 <br>
 
-**The continuation: [Simple Scripts 2](./07-imple-scripts-2.md)**
+**The continuation: [Simple Scripts 2](./07-simple-scripts-2.md)**
