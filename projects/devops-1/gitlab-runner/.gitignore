@@ -1,0 +1,14 @@
+# Runner credentials and registration state
+.state/
+
+.env
+.env.*
+
+# Generated runner configuration
+config.toml
+
+*.tmp
+*.log
+.DS_Store
+*.swp
+*.bak

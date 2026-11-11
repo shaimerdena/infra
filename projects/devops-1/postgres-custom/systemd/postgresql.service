@@ -1,0 +1,25 @@
+[Unit]
+Description=PostgreSQL Docker Container
+Requires=docker.service
+Wants=network-online.target
+After=docker.service network-online.target
+
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+
+Type=simple
+ExecStart=/usr/bin/docker start --attach postgres-db
+ExecStartPost=/opt/postgres-custom/scripts/wait-for-postgresql.sh
+ExecStop=/usr/bin/docker stop --timeout 30 postgres-db
+
+Restart=always
+RestartSec=5
+TimeoutStopSec=40
+
+StandardOutput=append:/var/log/postgresql/output.log
+StandardError=append:/var/log/postgresql/error.log
+
+[Install]
+WantedBy=multi-user.target

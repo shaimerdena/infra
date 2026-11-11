@@ -1,0 +1,23 @@
+[Unit]
+Description=GitLab Runner Docker Container
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=simple
+
+ExecStart=/usr/bin/docker start --attach gitlab-runner
+ExecStop=/usr/bin/docker stop --time 30 gitlab-runner
+
+Restart=always
+RestartSec=5
+
+TimeoutStartSec=0
+TimeoutStopSec=40
+
+[Install]
+WantedBy=multi-user.target

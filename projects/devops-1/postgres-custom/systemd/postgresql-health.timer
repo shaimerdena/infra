@@ -1,0 +1,11 @@
+[Unit]
+Description=Run PostgreSQL Health Check Every 30 Seconds
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=30s
+AccuracySec=1s
+Unit=postgresql-health.service
+
+[Install]
+WantedBy=timers.target

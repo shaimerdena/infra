@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily PostgreSQL log rotation
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+Unit=postgresql-log-rotate.service
+
+[Install]
+WantedBy=timers.target

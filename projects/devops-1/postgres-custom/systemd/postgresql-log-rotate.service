@@ -1,0 +1,6 @@
+[Unit]
+Description=Rotate PostgreSQL logs
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/logrotate /etc/logrotate.d/postgresql-custom
