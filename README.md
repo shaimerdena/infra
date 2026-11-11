@@ -36,7 +36,8 @@ coming soon...
 ## Kubernetes
 coming soon...
 
-## Projects (scripts)
+## Projects
 - [Simple scripts](projects/simple-scripts)
+- [Devops 1 projects](projects/devops-1)
 ## Resources
 - Linux Bible (11th Edition, 2026) - Negus Christopher
