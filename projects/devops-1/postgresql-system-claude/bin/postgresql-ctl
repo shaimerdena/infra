@@ -1,0 +1,271 @@
+#!/usr/bin/env bash
+# postgresql-ctl — helper used by postgresql.service and postgresql-logrotate.service
+#
+#   build      build the container image and enforce the size limit
+#   prestart   ExecStartPre: prepare dirs/permissions, remove stale container
+#   run        ExecStart: run the container in the foreground, relay logs, monitor health
+#   health     run one health check (SELECT 1) and exit 0/1
+#   logrotate  rotate output.log / error.log without losing lines
+#   verify     prove stdout/stderr reach the log files, before and after a rotation
+#
+# Everything is configured through /etc/default/postgresql-container.
+set -uo pipefail
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+CONF="${PG_CONF:-/etc/default/postgresql-container}"
+if [ -r "$CONF" ]; then set -a; . "$CONF"; set +a; fi
+
+: "${PG_IMAGE:=postgresql-slim:17}"
+: "${PG_CONTAINER_NAME:=postgresql}"
+: "${PG_DATA_DIR:=/var/lib/postgresql/data}"
+: "${PG_LOG_DIR:=/var/log/postgresql}"
+: "${PG_UID:=1001}"
+: "${PG_GID:=$PG_UID}"
+: "${PG_PUBLISH:=127.0.0.1:5432}"
+: "${POSTGRES_USER:=postgres}"
+: "${POSTGRES_DB:=postgres}"
+: "${PG_START_TIMEOUT:=60}"
+: "${PG_HEALTH_INTERVAL:=30}"
+: "${PG_HEALTH_TIMEOUT:=5}"
+: "${PG_HEALTH_RETRIES:=3}"
+: "${PG_STOP_TIMEOUT:=30}"
+: "${PG_LOG_KEEP:=7}"
+: "${PG_MAX_IMAGE_BYTES:=100000000}"
+: "${PG_SRC_DIR:=/opt/postgresql-systemd}"
+: "${PG_DOCKER:=docker}"
+export POSTGRES_USER POSTGRES_DB
+
+OUT_LOG="$PG_LOG_DIR/output.log"
+ERR_LOG="$PG_LOG_DIR/error.log"
+
+log() { echo "postgresql-ctl: $*" >&2; }
+docker() { command "$PG_DOCKER" "$@"; }
+
+# ---------------------------------------------------------------- build
+cmd_build() {
+    docker build --pull \
+        --build-arg "PG_UID=$PG_UID" \
+        -t "$PG_IMAGE" "$PG_SRC_DIR/image" || return 1
+    local size
+    size="$(docker image inspect -f '{{.Size}}' "$PG_IMAGE")" || return 1
+    log "image $PG_IMAGE is $size bytes (limit $PG_MAX_IMAGE_BYTES)"
+    if [ "$size" -ge "$PG_MAX_IMAGE_BYTES" ]; then
+        log "ERROR: image exceeds the size limit"
+        return 1
+    fi
+}
+
+# ------------------------------------------------------------- prestart
+prepare_paths() {
+    # logs: root-owned, not world readable
+    install -d -m 0750 -o root -g root "$PG_LOG_DIR"
+    local f
+    for f in "$OUT_LOG" "$ERR_LOG"; do
+        ( umask 027; : >>"$f" )          # create if missing, never truncate
+        chmod 0640 "$f"
+    done
+    # data: only the container user may enter it
+    install -d -m 0700 -o "$PG_UID" -g "$PG_GID" "$PG_DATA_DIR"
+    if [ "$(stat -c %u "$PG_DATA_DIR")" != "$PG_UID" ] || \
+       { [ -d "$PG_DATA_DIR/pgdata" ] && [ "$(stat -c %u "$PG_DATA_DIR/pgdata")" != "$PG_UID" ]; }; then
+        chown -R "$PG_UID:$PG_GID" "$PG_DATA_DIR"
+    fi
+    chmod 0700 "$PG_DATA_DIR"
+    [ ! -d "$PG_DATA_DIR/pgdata" ] || chmod 0700 "$PG_DATA_DIR/pgdata"
+}
+
+cmd_prestart() {
+    prepare_paths || return 1
+    if ! docker image inspect "$PG_IMAGE" >/dev/null 2>&1; then
+        log "image $PG_IMAGE not found; run: postgresql-ctl build"
+        return 1
+    fi
+    # never leave a duplicate/stale container behind
+    docker rm -f "$PG_CONTAINER_NAME" >/dev/null 2>&1 || true
+}
+
+# --------------------------------------------------------------- health
+cmd_health() {
+    local out
+    out="$(timeout -k 1 "$PG_HEALTH_TIMEOUT" \
+        "$PG_DOCKER" exec -e PGCONNECT_TIMEOUT="$PG_HEALTH_TIMEOUT" "$PG_CONTAINER_NAME" \
+        psql -X -U "$POSTGRES_USER" -d postgres -tAqc 'SELECT 1' 2>/dev/null)" || return 1
+    [ "$out" = "1" ]
+}
+
+# --------------------------------------------------------------- relay
+# Append each line to the destination, re-opening the file for every write.
+# Because the path (not a long-lived fd) is used, a rename-based rotation can never
+# make us write to a rotated file for more than the instant of a single write, and
+# nothing is lost (no copytruncate window).
+relay() {
+    local fifo="$1" dest="$2" line
+    while IFS= read -r line || [ -n "$line" ]; do
+        printf '%s\n' "$line" >>"$dest" 2>/dev/null || printf '%s\n' "$line" >&2
+    done <"$fifo"
+}
+
+# -------------------------------------------------------------- monitor
+# Runs inside the service cgroup, so it dies with the service: an intentional
+# `systemctl stop` can never be undone by it. Recovery = make the container exit;
+# systemd's Restart= (RestartSec=5, StartLimit*) then does the actual restart.
+monitor() {
+    local rt="$1" waited=0 fails=0
+    until cmd_health; do
+        if [ "$waited" -ge "$PG_START_TIMEOUT" ]; then
+            log "PostgreSQL not ready after ${PG_START_TIMEOUT}s: failing startup"
+            : >"$rt/unhealthy"
+            docker stop --time="$PG_STOP_TIMEOUT" "$PG_CONTAINER_NAME" >/dev/null 2>&1 || true
+            return 1
+        fi
+        sleep 1; waited=$((waited + 1))
+    done
+    log "PostgreSQL ready after ~${waited}s"
+    systemd-notify --ready --status="PostgreSQL accepting queries" 2>/dev/null || true
+
+    while :; do
+        sleep "$PG_HEALTH_INTERVAL"
+        if cmd_health; then
+            fails=0
+        else
+            fails=$((fails + 1))
+            log "health check failed ($fails/$PG_HEALTH_RETRIES)"
+            if [ "$fails" -ge "$PG_HEALTH_RETRIES" ]; then
+                log "ERROR: $PG_HEALTH_RETRIES consecutive health check failures; recovering via systemd restart"
+                : >"$rt/unhealthy"
+                docker stop --time="$PG_STOP_TIMEOUT" "$PG_CONTAINER_NAME" >/dev/null 2>&1 || true
+                return 1
+            fi
+        fi
+    done
+}
+
+# ------------------------------------------------------------------ run
+wait_pid() { # wait until pid has really exited, even if wait is interrupted by a trap
+    local pid="$1" rc=0
+    while :; do
+        wait "$pid"; rc=$?
+        kill -0 "$pid" 2>/dev/null || break
+    done
+    return $rc
+}
+
+on_term() { docker stop --time="$PG_STOP_TIMEOUT" "$PG_CONTAINER_NAME" >/dev/null 2>&1 || true; }
+
+cmd_run() {
+    umask 027
+    local rt="${RUNTIME_DIRECTORY:-/run/postgresql-container}"
+    mkdir -p "$rt"
+    rm -f "$rt/out.fifo" "$rt/err.fifo" "$rt/unhealthy"
+    mkfifo -m 0600 "$rt/out.fifo" "$rt/err.fifo" || return 1
+
+    trap on_term TERM INT
+
+    # relays ignore TERM and end on EOF, so every buffered line is flushed on shutdown
+    ( trap '' TERM INT; relay "$rt/out.fifo" "$OUT_LOG" ) & local r1=$!
+    ( trap '' TERM INT; relay "$rt/err.fifo" "$ERR_LOG" ) & local r2=$!
+    monitor "$rt" & local mon=$!
+
+    local args=(run --rm --name "$PG_CONTAINER_NAME"
+        --user "$PG_UID:$PG_GID"
+        --stop-signal SIGINT
+        --read-only
+        --tmpfs "/run/postgresql:rw,uid=$PG_UID,gid=$PG_GID,mode=0755"
+        --tmpfs /tmp:rw,mode=1777
+        --cap-drop ALL --security-opt no-new-privileges
+        --log-opt max-size=10m --log-opt max-file=1
+        -v "$PG_DATA_DIR:/var/lib/postgresql/data:z"
+        -e POSTGRES_PASSWORD -e POSTGRES_USER -e POSTGRES_DB)
+    [ -z "$PG_PUBLISH" ] || args+=(-p "$PG_PUBLISH:5432")
+    args+=("$PG_IMAGE")
+
+    # The docker client ignores TERM: stopping is done with `docker stop`
+    # (ExecStop / on_term) so Postgres gets SIGINT (fast shutdown), not a raw SIGTERM.
+    ( trap '' TERM INT; exec "$PG_DOCKER" "${args[@]}" ) >"$rt/out.fifo" 2>"$rt/err.fifo" &
+    local dpid=$!
+    wait_pid "$dpid"; local rc=$?
+
+    kill -KILL "$mon" 2>/dev/null; { wait "$mon"; } 2>/dev/null
+    wait_pid "$r1"; wait_pid "$r2"     # flush remaining log lines
+    if [ -e "$rt/unhealthy" ] && [ "$rc" -eq 0 ]; then rc=1; fi
+    rm -f "$rt/out.fifo" "$rt/err.fifo" "$rt/unhealthy"
+    log "container exited with status $rc"
+    return "$rc"
+}
+
+# ------------------------------------------------------------ logrotate
+rotate_one() {
+    local f="$1" i
+    if [ ! -e "$f" ]; then
+        ( umask 027; : >>"$f" ); chmod 0640 "$f"
+        log "$f was missing: created"; return 0
+    fi
+    if [ ! -s "$f" ]; then
+        log "$f is empty: nothing to rotate"; return 0
+    fi
+    rm -f -- "$f.$PG_LOG_KEEP.gz"
+    for ((i = PG_LOG_KEEP - 1; i >= 2; i--)); do
+        if [ -e "$f.$i.gz" ]; then mv -f -- "$f.$i.gz" "$f.$((i + 1)).gz"; fi
+    done
+    # .1 stays uncompressed for one cycle so a writer that still held the old
+    # inode at rotation time can finish; it is compressed on the next run.
+    if [ -e "$f.1" ]; then
+        gzip -c -- "$f.1" >"$f.2.gz.tmp" || { rm -f "$f.2.gz.tmp"; return 1; }
+        chmod 0640 "$f.2.gz.tmp"
+        mv -f -- "$f.2.gz.tmp" "$f.2.gz"
+        rm -f -- "$f.1"
+    fi
+    mv -f -- "$f" "$f.1"
+    # recreate immediately (append-create never truncates a file the relay recreated)
+    ( umask 027; : >>"$f" ); chmod 0640 "$f"
+    log "rotated $f"
+}
+
+cmd_logrotate() {
+    install -d -m 0750 -o root -g root "$PG_LOG_DIR"
+    if command -v flock >/dev/null 2>&1; then
+        exec 9>"$PG_LOG_DIR/.rotate.lock"
+        flock -n 9 || { log "another rotation is running"; return 0; }
+    fi
+    local rc=0
+    rotate_one "$OUT_LOG" || rc=1
+    rotate_one "$ERR_LOG" || rc=1
+    return $rc
+}
+
+# --------------------------------------------------------------- verify
+wait_for_line() { # file text
+    local n
+    for n in 1 2 3 4 5 6 7 8 9 10; do
+        grep -qF -- "$2" "$1" 2>/dev/null && return 0
+        sleep 0.5
+    done
+    return 1
+}
+
+cmd_verify() {
+    local tag="verify-$(date +%s)-$$" ok=0
+    docker exec "$PG_CONTAINER_NAME" sh -c \
+        "echo STDOUT-$tag >/proc/1/fd/1; echo STDERR-$tag >/proc/1/fd/2" \
+        || { log "FAIL: container not running"; return 1; }
+    wait_for_line "$OUT_LOG" "STDOUT-$tag" && echo "PASS stdout -> $OUT_LOG" || { echo "FAIL stdout"; ok=1; }
+    wait_for_line "$ERR_LOG" "STDERR-$tag" && echo "PASS stderr -> $ERR_LOG" || { echo "FAIL stderr"; ok=1; }
+
+    cmd_logrotate || ok=1
+    docker exec "$PG_CONTAINER_NAME" sh -c \
+        "echo STDOUT-after-$tag >/proc/1/fd/1; echo STDERR-after-$tag >/proc/1/fd/2" || ok=1
+    wait_for_line "$OUT_LOG" "STDOUT-after-$tag" && echo "PASS stdout continues after rotation" || { echo "FAIL stdout after rotation"; ok=1; }
+    wait_for_line "$ERR_LOG" "STDERR-after-$tag" && echo "PASS stderr continues after rotation" || { echo "FAIL stderr after rotation"; ok=1; }
+    grep -qF "STDOUT-$tag" "$OUT_LOG.1" 2>/dev/null && echo "PASS earlier output preserved in $OUT_LOG.1" || { echo "FAIL old output missing"; ok=1; }
+    return $ok
+}
+
+case "${1:-}" in
+    build)     cmd_build ;;
+    prestart)  cmd_prestart ;;
+    run)       cmd_run ;;
+    health)    cmd_health ;;
+    logrotate) cmd_logrotate ;;
+    verify)    cmd_verify ;;
+    *) echo "usage: $0 {build|prestart|run|health|logrotate|verify}" >&2; exit 2 ;;
+esac
