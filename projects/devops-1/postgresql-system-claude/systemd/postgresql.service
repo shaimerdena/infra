@@ -1,0 +1,39 @@
+[Unit]
+Description=PostgreSQL in a Docker container (non-root)
+# Dependencies (must be running) and ordering (start after) for both Docker and network
+Requires=docker.service
+After=docker.service
+Wants=network-online.target
+After=network-online.target
+# Limit repeated restart attempts: at most 5 starts per 5 minutes, then the unit stays failed
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+# notify: the service is "started" only after SELECT 1 succeeds (see postgresql-ctl monitor)
+Type=notify
+NotifyAccess=all
+EnvironmentFile=/etc/default/postgresql-container
+RuntimeDirectory=postgresql-container
+RuntimeDirectoryMode=0750
+
+ExecStartPre=@CTL@ prestart
+ExecStart=@CTL@ run
+# graceful: docker sends SIGINT (PostgreSQL fast shutdown), SIGKILL only after the timeout
+ExecStop=-@DOCKER@ stop --time=${PG_STOP_TIMEOUT} ${PG_CONTAINER_NAME}
+
+# 60 s deadline for readiness; if READY is not reached the start fails
+TimeoutStartSec=60
+TimeoutStopSec=60
+
+# Unexpected exits (crash, OOM, health-check recovery) are restarted after 5 s.
+# An explicit `systemctl stop` is never restarted.
+Restart=always
+RestartSec=5
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=postgresql
+
+[Install]
+WantedBy=multi-user.target

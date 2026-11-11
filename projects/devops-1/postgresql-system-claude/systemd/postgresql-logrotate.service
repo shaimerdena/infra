@@ -1,0 +1,9 @@
+[Unit]
+Description=Rotate PostgreSQL container logs
+Documentation=file:///opt/postgresql-systemd/README.md
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/default/postgresql-container
+ExecStart=@CTL@ logrotate
+SyslogIdentifier=postgresql-logrotate
